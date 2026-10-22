@@ -122,7 +122,7 @@ a{color:var(--accent)}
     <ol class="steps">
       <li>Öffne <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">aistudio.google.com/apikey</a> und melde dich mit deinem Google-Konto an.</li>
       <li>Tippe auf <b>„API-Schlüssel erstellen“</b> (Create API key).</li>
-      <li>Kopiere den Schlüssel (beginnt meist mit <code>AIza…</code>) und füge ihn hier ein.</li>
+      <li>Kopiere den Schlüssel (beginnt mit <code>AQ.</code> oder <code>AIza</code>) und füge ihn hier ein.</li>
     </ol>
     <input id="key-in" placeholder="API-Schlüssel einfügen" autocomplete="off" autocapitalize="off" spellcheck="false">
     <button class="btn block" id="key-save" style="margin-top:10px">Speichern & testen</button>
@@ -292,40 +292,54 @@ All learner text comes from automatic speech recognition: IGNORE punctuation, ca
 
 /* ================= Gemini ================= */
 const API="https://generativelanguage.googleapis.com/v1beta";
-async function pickModel(key){
+async function listModels(key){
   const r=await fetch(`${API}/models?pageSize=200`,{headers:{"x-goog-api-key":key}});
-  if(!r.ok){const t=await r.text();throw new Error(r.status===400||r.status===403?"Schlüssel ungültig ("+r.status+")":"Fehler "+r.status+": "+t.slice(0,120));}
+  if(!r.ok){const t=await r.text();throw new Error(r.status===400||r.status===401||r.status===403?"Schlüssel ungültig ("+r.status+")":"Fehler "+r.status+": "+t.slice(0,120));}
   const j=await r.json();
-  const ms=(j.models||[]).filter(m=>(m.supportedGenerationMethods||[]).includes("generateContent")).map(m=>m.name.replace(/^models\//,""));
-  const ok=ms.filter(n=>/^gemini-[\d.]+-flash(-latest)?$/.test(n));
+  const ms=(j.models||[]).filter(m=>(m.supportedGenerationMethods||[]).includes("generateContent")).map(m=>m.name.replace(/^models\//,""))
+    .filter(n=>/^gemini-/.test(n)&&!/(image|tts|audio|live|embed|vision|thinking|computer|robotics|native)/.test(n));
   const ver=n=>parseFloat((n.match(/gemini-([\d.]+)/)||[0,0])[1]);
-  ok.sort((a,b)=>ver(b)-ver(a));
-  if(ok.length) return ok[0];
-  const any=ms.filter(n=>/flash/.test(n)&&!/(image|tts|audio|live|embed|vision|thinking)/.test(n)).sort((a,b)=>ver(b)-ver(a)||(/preview|exp/.test(a)?1:-1));
-  if(any.length) return any[0];
-  if(ms.length) return ms[0];
-  throw new Error("Kein passendes Modell gefunden.");
+  const score=n=>{ let s=ver(n)*10; if(/-flash(-latest)?$/.test(n)) s+=5; else if(/flash-lite(-latest)?$/.test(n)) s+=3; else if(/flash/.test(n)) s+=1; else s-=40; if(/preview|exp/.test(n)) s-=2; if(/pro/.test(n)) s-=60; return s; };
+  const out=ms.sort((a,b)=>score(b)-score(a)).slice(0,8);
+  if(!out.length) throw new Error("Kein passendes Modell gefunden.");
+  return out;
 }
 async function gemini(prompt,o={}){ try{ return await gemini0(prompt,o); }catch(e){ if(e instanceof TypeError) throw new Error("Keine Verbindung zu Gemini – Internet prüfen und aufs Mikro tippen."); throw e; } }
-async function gemini0(prompt,{json=false,max=500,temp=0.9}={}){
-  if(!S.key) throw new Error("Kein Schlüssel");
-  if(!S.model){S.model=await pickModel(S.key);save();}
+async function callModel(model,prompt,{json,max,temp}){
   const body={contents:[{role:"user",parts:[{text:prompt}]}],generationConfig:{temperature:temp,maxOutputTokens:max}};
   if(json) body.generationConfig.responseMimeType="application/json";
-  const think=S.noThink && /2\.5/.test(S.model);
-  if(think) body.generationConfig.thinkingConfig={thinkingBudget:0};
-  else if(S.noThink && /gemini-[3-9]/.test(S.model)) body.generationConfig.thinkingConfig={thinkingLevel:"low"};
-  let r=await fetch(`${API}/models/${S.model}:generateContent`,{method:"POST",headers:{"Content-Type":"application/json","x-goog-api-key":S.key},body:JSON.stringify(body)});
-  if(r.status===400 && body.generationConfig.thinkingConfig){ delete body.generationConfig.thinkingConfig; S.noThink=false; save();
-    r=await fetch(`${API}/models/${S.model}:generateContent`,{method:"POST",headers:{"Content-Type":"application/json","x-goog-api-key":S.key},body:JSON.stringify(body)}); }
-  if(r.status===404){ S.model=""; save(); throw new Error("Modell nicht mehr verfügbar – bitte nochmal versuchen."); }
-  if(r.status===429) throw new Error("Kurz zu viele Anfragen (Gratis-Limit). 30–60 Sekunden warten, dann weiter.");
-  if(!r.ok){const t=await r.text();throw new Error("Gemini-Fehler "+r.status+": "+t.slice(0,150));}
-  const j=await r.json();
-  const txt=((j.candidates||[])[0]?.content?.parts||[]).map(p=>p.text||"").join("").trim();
-  if(!txt) throw new Error("Leere Antwort – bitte nochmal.");
-  if(!json) return txt;
-  const m=txt.match(/[\[{][\s\S]*[\]}]/); return JSON.parse(m?m[0]:txt);
+  const noThink=!(S.thinkBad||[]).includes(model);
+  if(noThink && /2\.5/.test(model)) body.generationConfig.thinkingConfig={thinkingBudget:0};
+  else if(noThink && /gemini-[3-9]/.test(model)) body.generationConfig.thinkingConfig={thinkingLevel:"low"};
+  const go=()=>fetch(`${API}/models/${model}:generateContent`,{method:"POST",headers:{"Content-Type":"application/json","x-goog-api-key":S.key},body:JSON.stringify(body)});
+  let r=await go();
+  if(r.status===400 && body.generationConfig.thinkingConfig){ delete body.generationConfig.thinkingConfig; S.thinkBad=[...(S.thinkBad||[]),model]; save(); r=await go(); }
+  return r;
+}
+async function gemini0(prompt,{json=false,max=500,temp=0.9}={}){
+  if(!S.key) throw new Error("Kein Schlüssel");
+  if(!Array.isArray(S.models)||!S.models.length){ S.models=await listModels(S.key); save(); }
+  const order=[...new Set([S.model,...S.models].filter(Boolean))];
+  let lastStatus=0, lastText="";
+  for(const model of order){
+    const r=await callModel(model,prompt,{json,max,temp});
+    if(r.ok){
+      const j=await r.json();
+      const txt=((j.candidates||[])[0]?.content?.parts||[]).map(p=>p.text||"").join("").trim();
+      if(!txt){ lastStatus=-1; continue; }
+      if(S.model!==model){ S.model=model; save(); }
+      if(!json) return txt;
+      const m=txt.match(/[\[{][\s\S]*[\]}]/); return JSON.parse(m?m[0]:txt);
+    }
+    lastStatus=r.status; lastText=await r.text().catch(()=>"");
+    if(r.status===401||r.status===403) throw new Error("Schlüssel ungültig oder gesperrt ("+r.status+").");
+    if([404,429,500,503,504].includes(r.status)) continue;
+    throw new Error("Gemini-Fehler "+r.status+": "+lastText.slice(0,150));
+  }
+  if(lastStatus===429) throw new Error("Gratis-Limit kurz erreicht. 1 Minute warten, dann aufs Mikro tippen.");
+  if(lastStatus===503||lastStatus===500||lastStatus===504) throw new Error("Google ist gerade überlastet. Kurz warten, dann aufs Mikro tippen.");
+  if(lastStatus===404){ S.models=[]; save(); }
+  throw new Error("Gerade keine Antwort von Gemini – bitte nochmal versuchen.");
 }
 
 /* ================= Voice output ================= */
@@ -695,8 +709,10 @@ $("#backup-load").addEventListener("click",()=>{const b=$("#backup-box");if(b.cl
 $("#key-save").addEventListener("click",async()=>{
   const k=$("#key-in").value.trim(); const m=$("#key-msg"); if(!k){m.textContent="Bitte Schlüssel einfügen.";return;}
   m.textContent="Teste …"; $("#key-save").disabled=true;
-  try{ const model=await pickModel(k); S.key=k; S.model=model; S.noThink=true; save();
-    await gemini("Say only: OK",{max:20}); m.textContent="✓ Funktioniert ("+model+")"; setTimeout(()=>show("home"),600);
+  try{ const models=await listModels(k); S.key=k; S.models=models; S.model=""; save();
+    try{ await gemini("Say only: OK",{max:20}); m.textContent="✓ Funktioniert ("+S.model+")"; }
+    catch(e){ m.textContent="✓ Schlüssel ist gültig. (Google gerade etwas ausgelastet – das Training klappt trotzdem, sonst kurz warten.)"; }
+    setTimeout(()=>show("home"),1500);
   }catch(e){ m.textContent="✗ "+(e.message||e); }
   finally{ $("#key-save").disabled=false; }
 });
