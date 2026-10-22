@@ -1,0 +1,712 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Speaking Coach">
+<meta name="theme-color" content="#1F4E8C">
+<title>Speaking Coach</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%231F4E8C'/%3E%3Crect x='38' y='20' width='24' height='40' rx='12' fill='white'/%3E%3Cpath d='M28 50a22 22 0 0 0 44 0' stroke='white' stroke-width='6' fill='none' stroke-linecap='round'/%3E%3Cpath d='M50 72v10' stroke='white' stroke-width='6' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%231F4E8C'/%3E%3Crect x='38' y='20' width='24' height='40' rx='12' fill='white'/%3E%3Cpath d='M28 50a22 22 0 0 0 44 0' stroke='white' stroke-width='6' fill='none' stroke-linecap='round'/%3E%3Cpath d='M50 72v10' stroke='white' stroke-width='6' stroke-linecap='round'/%3E%3C/svg%3E">
+<style>
+:root{
+  --bg:#F6F4EF; --card:#FFFFFF; --ink:#1B1F24; --muted:#5E6670; --line:#E3DED4;
+  --accent:#1F4E8C; --accent-ink:#FFFFFF; --accent-soft:#E6EEF8; --ok:#0E7C6B; --ok-soft:#E2F3EF;
+  --bad:#B3261E; --bad-soft:#FBE9E7; --warn:#A35D00; --warn-soft:#FFF3DF;
+  --purple:#6B3FA0; --purple-soft:#F1EAF9; --sam:#0E7C6B; --sam-soft:#E2F3EF;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#14171B; --card:#1D2126; --ink:#ECEEF0; --muted:#9AA3AD; --line:#2E343B;
+    --accent:#7FB0F0; --accent-ink:#0E1620; --accent-soft:#1F2D40; --ok:#4FC8B0; --ok-soft:#163029;
+    --bad:#F28B82; --bad-soft:#3A1F1D; --warn:#F2B35B; --warn-soft:#3A2C17;
+    --purple:#C3A4EC; --purple-soft:#2D2440; --sam:#4FC8B0; --sam-soft:#163029;
+  }
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--ink)}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,sans-serif;font-size:16px;line-height:1.5}
+.wrap{max-width:720px;margin:0 auto;padding:max(16px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) 140px max(16px,env(safe-area-inset-left))}
+h1{font-family:Georgia,"Times New Roman",serif;font-weight:600;font-size:27px;margin:4px 0 2px}
+h2{font-size:17px;margin:0 0 10px}
+h3{font-size:13px;font-weight:700;margin:16px 0 6px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+.sub{color:var(--muted);font-size:14px;margin:0 0 16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:12px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+select,input,textarea{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 12px;width:100%}
+.btn{border:0;border-radius:12px;padding:12px 16px;font:600 15px inherit;font-family:inherit;cursor:pointer;background:var(--accent);color:var(--accent-ink)}
+.btn.ghost{background:transparent;color:var(--accent);border:1px solid var(--line)}
+.btn.small{padding:7px 11px;font-size:13px}
+.btn:disabled{opacity:.45}
+.btn.block{width:100%}
+.modes{display:grid;gap:10px}
+.mode{display:flex;gap:14px;align-items:center;text-align:left;width:100%;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;cursor:pointer;color:var(--ink);font-family:inherit}
+.mode .ic{font-size:28px;flex:0 0 44px;height:44px;border-radius:12px;background:var(--accent-soft);display:flex;align-items:center;justify-content:center}
+.mode b{display:block;font-size:16px}
+.mode span{font-size:14px;color:var(--muted)}
+.topbar{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.topbar .title{font-weight:700;font-size:17px;flex:1}
+.timer{font-variant-numeric:tabular-nums;font-weight:700;color:var(--muted)}
+.impulse{border-left:4px solid var(--accent);padding:2px 0 2px 14px;margin:4px 0}
+.impulse .kind{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--accent)}
+.impulse .quote{font-family:Georgia,serif;font-size:21px;line-height:1.4;margin:6px 0}
+.impulse .author,.impulse .cap{color:var(--muted);font-size:14px}
+.task{background:var(--accent-soft);border-radius:10px;padding:10px 12px;font-weight:600;font-size:15px;margin-top:10px}
+.starters{margin:8px 0 0;padding-left:22px;font-size:14.5px}
+.starters li{margin:2px 0}
+.starters i{color:var(--muted);font-style:normal;font-size:13px}
+.chat{display:flex;flex-direction:column;gap:10px}
+.msg{max-width:90%;padding:10px 13px;border-radius:14px;font-size:15.5px;white-space:pre-wrap}
+.msg .who{display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px}
+.msg.examiner{background:var(--card);border:1px solid var(--line);align-self:flex-start;border-bottom-left-radius:4px}
+.msg.examiner .who{color:var(--accent)}
+.msg.sam{background:var(--sam-soft);align-self:flex-start;border-bottom-left-radius:4px}
+.msg.sam .who{color:var(--sam)}
+.msg.me{background:var(--accent-soft);align-self:flex-end;border-bottom-right-radius:4px}
+.msg.me .who{color:var(--muted)}
+.msg.live{opacity:.7;font-style:italic}
+.dock{position:fixed;left:0;right:0;bottom:0;background:linear-gradient(to top,var(--bg) 70%,transparent);padding:18px max(16px,env(safe-area-inset-right)) max(16px,env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left))}
+.dock-in{max-width:720px;margin:0 auto;display:flex;align-items:center;gap:12px}
+.mic{flex:0 0 76px;height:76px;border-radius:50%;border:0;background:var(--accent);color:var(--accent-ink);font-size:30px;cursor:pointer;box-shadow:0 4px 18px rgba(31,78,140,.35);position:relative}
+.mic.listening{background:var(--bad);animation:pulse 1.4s infinite}
+.mic.busy{background:var(--muted)}
+.mic.speaking{background:var(--sam)}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(179,38,30,.5)}70%{box-shadow:0 0 0 18px rgba(179,38,30,0)}100%{box-shadow:0 0 0 0 rgba(179,38,30,0)}}
+.dock .state{flex:1;font-size:14px;color:var(--muted);line-height:1.35}
+.dock .state b{color:var(--ink);display:block;font-size:15px}
+.dock .side{display:flex;flex-direction:column;gap:6px}
+.fb-sec{border-radius:12px;padding:12px 14px;margin:10px 0}
+.fb-sec h4{margin:0 0 6px;font-size:14px}
+.fb-good{background:var(--ok-soft)} .fb-good h4{color:var(--ok)}
+.fb-fix{background:var(--bad-soft)} .fb-fix h4{color:var(--bad)}
+.fb-up{background:var(--purple-soft)} .fb-up h4{color:var(--purple)}
+.fb-flow{background:var(--warn-soft)} .fb-flow h4{color:var(--warn)}
+.fb-rep{background:var(--accent-soft)} .fb-rep h4{color:var(--accent)}
+.fix{padding:6px 0;border-top:1px dashed rgba(127,127,127,.25)} .fix:first-of-type{border-top:0}
+.said{text-decoration:line-through;color:var(--bad)}
+.better{font-weight:600}
+.why{font-size:14px;color:var(--muted)}
+ul.plain{margin:0;padding-left:18px} ul.plain li{margin:3px 0}
+.scores{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.score{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:10px;text-align:center}
+.score b{display:block;font-size:24px}
+.score span{font-size:12px;color:var(--muted)}
+.bs{display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-top:1px solid var(--line)} .bs:first-child{border-top:0}
+.bs .t{font-weight:600} .bs .h{font-size:14px;color:var(--muted)}
+.bs .cnt{margin-left:auto;flex:0 0 auto;font-size:12px;font-weight:700;border-radius:999px;padding:2px 8px;background:var(--bad-soft);color:var(--bad)}
+.bs.fixed .cnt{background:var(--ok-soft);color:var(--ok)} .bs.fixed .t{text-decoration:line-through;opacity:.6}
+.x{background:none;border:0;color:var(--muted);cursor:pointer;font-size:18px;padding:0 4px}
+.hist{display:grid;grid-template-columns:auto 1fr auto;gap:6px 10px;align-items:center;font-size:14px}
+.bar{height:8px;border-radius:4px;background:var(--line);overflow:hidden} .bar i{display:block;height:100%;background:var(--accent)}
+.note{font-size:13px;color:var(--muted)}
+.err{color:var(--bad);font-size:14px}
+.hidden{display:none!important}
+.steps{padding-left:20px;margin:6px 0} .steps li{margin:6px 0}
+a{color:var(--accent)}
+.typebox{display:flex;gap:8px;margin-top:10px}
+.toggle{display:flex;align-items:center;gap:10px;padding:8px 0}
+.toggle input{width:auto}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- SETUP -->
+<section id="v-setup" class="hidden">
+  <h1>Speaking Coach</h1>
+  <p class="sub">Einmalige Einrichtung (2 Minuten)</p>
+  <div class="card">
+    <h2>Kostenlosen Gemini-Schlüssel holen</h2>
+    <ol class="steps">
+      <li>Öffne <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">aistudio.google.com/apikey</a> und melde dich mit deinem Google-Konto an.</li>
+      <li>Tippe auf <b>„API-Schlüssel erstellen“</b> (Create API key).</li>
+      <li>Kopiere den Schlüssel (beginnt meist mit <code>AIza…</code>) und füge ihn hier ein.</li>
+    </ol>
+    <input id="key-in" placeholder="API-Schlüssel einfügen" autocomplete="off" autocapitalize="off" spellcheck="false">
+    <button class="btn block" id="key-save" style="margin-top:10px">Speichern & testen</button>
+    <p id="key-msg" class="note"></p>
+    <p class="note">Der Schlüssel bleibt nur auf deinem Handy gespeichert. Kostenlos im Free-Tier – es fällt nichts an, solange du kein Bezahlkonto hinterlegst.</p>
+  </div>
+</section>
+
+<!-- HOME -->
+<section id="v-home" class="hidden">
+  <h1>Speaking Coach</h1>
+  <p class="sub">Englisch-Sprechprüfung · Abitur 2027 · gN</p>
+  <div class="card">
+    <label class="note" for="topic">Thema</label>
+    <select id="topic" style="margin-top:4px"></select>
+  </div>
+  <div class="modes">
+    <button class="mode" data-mode="mono"><span class="ic">🎤</span><div><b>Monolog</b><span>Impuls bekommen, 3–4 min sprechen, Prüfer fragt nach</span></div></button>
+    <button class="mode" data-mode="dialog"><span class="ic">💬</span><div><b>Dialog mit Sam</b><span>Echtes Gespräch mit Partner – am Ende Einigung</span></div></button>
+    <button class="mode" data-mode="exam"><span class="ic">🎓</span><div><b>Prüfungssimulation</b><span>Warm-up → Monolog → Dialog, Feedback am Ende</span></div></button>
+    <button class="mode" data-mode="warm"><span class="ic">☕</span><div><b>Locker plaudern</b><span>Small Talk mit dem Prüfer zum Warmwerden</span></div></button>
+    <button class="mode" data-go="me"><span class="ic">🧱</span><div><b>Meine Baustellen & Verlauf</b><span>Worauf du achten musst, deine Punkte</span></div></button>
+    <button class="mode" data-go="settings"><span class="ic">⚙️</span><div><b>Einstellungen</b><span>Stimme, Tempo, Schlüssel</span></div></button>
+  </div>
+</section>
+
+<!-- SESSION -->
+<section id="v-session" class="hidden">
+  <div class="topbar">
+    <button class="btn ghost small" id="s-back">✕</button>
+    <div class="title" id="s-title">…</div>
+    <span class="timer" id="s-timer"></span>
+  </div>
+  <div class="card hidden" id="s-impulse"></div>
+  <div class="card hidden" id="s-starters">
+    <b style="font-size:14px">Deine 6 Satzanfänge</b>
+    <ol class="starters">
+      <li>The quote / picture shows that … <i>– worum geht's</i></li>
+      <li>In other words, … <i>– eigene Worte</i></li>
+      <li>I partly agree, because … <i>– Argument DAFÜR</i></li>
+      <li>For example, …</li>
+      <li>On the other hand, … <i>– Gegenseite</i></li>
+      <li>So, to sum up, …</li>
+    </ol>
+  </div>
+  <div class="chat" id="s-chat"></div>
+  <div id="s-error" class="err" style="margin-top:10px"></div>
+  <div id="s-feedback" style="margin-top:14px"></div>
+</section>
+
+<!-- ME -->
+<section id="v-me" class="hidden">
+  <div class="topbar"><button class="btn ghost small" data-go="home">←</button><div class="title">Meine Baustellen</div></div>
+  <div class="card">
+    <p class="note" style="margin-top:0">Zahl = wie oft der Fehler noch vorkam. Grün = zuletzt richtig gemacht. Der Coach achtet bei jedem Feedback darauf.</p>
+    <div id="bs-list"></div>
+    <div class="row" style="margin-top:12px"><input id="bs-add" placeholder="Eigene Baustelle …" style="flex:1"><button class="btn small" id="bs-add-btn">+</button></div>
+  </div>
+  <div class="card"><h2>Verlauf</h2><div id="hist"></div></div>
+</section>
+
+<!-- SETTINGS -->
+<section id="v-settings" class="hidden">
+  <div class="topbar"><button class="btn ghost small" data-go="home">←</button><div class="title">Einstellungen</div></div>
+  <div class="card">
+    <h2>Stimmen</h2>
+    <label class="note">Prüfer</label><select id="voice-ex"></select>
+    <label class="note" style="display:block;margin-top:8px">Sam (Partner)</label><select id="voice-sam"></select>
+    <label class="note" style="display:block;margin-top:8px">Sprechtempo: <span id="rate-v"></span></label>
+    <input type="range" id="rate" min="0.7" max="1.2" step="0.05" style="padding:0">
+    <button class="btn ghost small" id="voice-test" style="margin-top:8px">🔊 Testen</button>
+  </div>
+  <div class="card">
+    <h2>Gespräch</h2>
+    <label class="toggle"><input type="checkbox" id="auto-listen"> Nach jeder Antwort automatisch zuhören</label>
+    <label class="note">Pause, nach der deine Antwort automatisch abgeschickt wird: <span id="sil-v"></span> s</label>
+    <input type="range" id="silence" min="1.5" max="5" step="0.5" style="padding:0">
+    <p class="note">Im Monolog wird nie automatisch abgeschickt – da tippst du selbst auf „Fertig“.</p>
+  </div>
+  <div class="card">
+    <h2>Gemini</h2>
+    <p class="note" style="margin-top:0">Modell: <b id="model-name">–</b></p>
+    <button class="btn ghost small" id="key-change">Schlüssel ändern</button>
+  </div>
+  <div class="card">
+    <h2>Sicherung</h2>
+    <p class="note" style="margin-top:0">Baustellen & Verlauf sind auf diesem Gerät gespeichert.</p>
+    <div class="row"><button class="btn ghost small" id="backup-copy">Backup kopieren</button><button class="btn ghost small" id="backup-load">Backup einfügen</button></div>
+    <textarea id="backup-box" class="hidden" style="margin-top:8px;min-height:90px"></textarea>
+    <p id="backup-msg" class="note"></p>
+  </div>
+</section>
+</div>
+
+<!-- DOCK -->
+<div class="dock hidden" id="dock">
+  <div class="dock-in">
+    <button class="mic" id="mic" aria-label="Sprechen">🎙️</button>
+    <div class="state" id="state"><b>Bereit</b>Tippe zum Sprechen</div>
+    <div class="side">
+      <button class="btn small" id="done-btn">Fertig</button>
+      <button class="btn ghost small" id="type-btn">⌨️</button>
+    </div>
+  </div>
+  <div class="dock-in typebox hidden" id="typebox">
+    <input id="type-in" placeholder="Antwort tippen …"><button class="btn small" id="type-send">➤</button>
+  </div>
+</div>
+
+<script>
+(function(){
+"use strict";
+const $=s=>document.querySelector(s);
+const el=(t,a={},...k)=>{const e=document.createElement(t);for(const x in a){if(x==="class")e.className=a[x];else if(x==="text")e.textContent=a[x];else e.setAttribute(x,a[x]);}k.forEach(c=>c!=null&&e.append(c));return e;};
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+
+/* ================= Storage ================= */
+const LS="speakingcoach.app.v1";
+const DEFAULT_BS=[
+ ["if-Satz: If I didn't have …, I would …","Im if-Teil KEIN would; im Hauptsatz would + Verb"],
+ ["Füllwörter: just, of course, I would say, I don't know","Lieber kurz pausieren oder „Well, …“"],
+ ["themselves / being themselves","people can be themselves"],
+ ["attribute vs. contribute","contribute to = beitragen; attribute sth to = zuschreiben"],
+ ["„the society“ → society","allgemein ohne the"],
+ ["fewer vs. less","fewer + zählbar, less + unzählbar"],
+ ["focus on / struggle to","focus ON sth; struggle TO do / WITH sth"],
+ ["worth / valuable","it's worth it / worth doing; valuable = wertvoll"],
+ ["Logik: agree = Argument FÜR die Aussage","„On the other hand“ = Gegenseite"]
+];
+let S={key:"",model:"",noThink:true,voiceEx:"",voiceSam:"",rate:0.95,autoListen:true,silence:2.5,
+  baustellen:DEFAULT_BS.map(([t,h])=>({text:t,hint:h,count:1,fixed:false})),history:[]};
+try{const v=JSON.parse(localStorage.getItem(LS)||"null");if(v)S=Object.assign(S,v);}catch(e){}
+const save=()=>{try{localStorage.setItem(LS,JSON.stringify(S));}catch(e){}};
+
+/* ================= Content ================= */
+const TOPICS=[["identity","Identity & being yourself"],["ambitions","Ambitions & obstacles"],["conformity","Conformity vs. individualism"],["diversity","Diversity & equality"],["gender","Gender roles"],["uk","The UK (Empire, Windrush, Brexit, monarchy)"],["macbeth","Shakespeare / Macbeth"],["media","Media & social media"],["environment","Environment & climate"],["travel","Travel & tourism"],["technology","Technology & AI"],["happiness","Money, success & happiness"]];
+const DIALOGS={
+ identity:"Your school wants to introduce a school uniform. Discuss and agree on a recommendation for the school board.",
+ ambitions:"A friend wants to drop out of school to become a full-time influencer. Discuss what advice to give and agree on one piece of advice.",
+ conformity:"Your year is planning the Abi party with a strict dress code. Discuss whether that is a good idea and agree on a rule.",
+ diversity:"Your town can spend money on either a multicultural festival or a new sports field. Discuss and agree on one project.",
+ gender:"Your school is considering separate maths and physics classes for boys and girls. Discuss and agree on a recommendation.",
+ uk:"Your class can choose a topic for a project week on the UK: the monarchy, Brexit or the Windrush generation. Discuss and agree on one.",
+ macbeth:"Your English course must choose one scene from Macbeth to perform for younger students. Discuss and agree on a scene.",
+ media:"Your school wants to ban smartphones for the whole school day. Discuss and agree on a rule.",
+ environment:"Your class has 2,000 euros for a climate project (solar panels, school garden or bike repair station). Discuss and agree on one.",
+ travel:"After the Abitur your class can either take a cheap flight to Barcelona or a train trip through Germany. Discuss and agree.",
+ technology:"Your school wants to allow AI chatbots for homework. Discuss advantages and dangers and agree on clear rules.",
+ happiness:"A company offers a well-paid but boring summer job; a volunteer project abroad is unpaid but exciting. Discuss what is better and agree."
+};
+const FALLBACK_QUOTES=[
+ ["Money can't buy happiness, but it can buy the things that make you happy.","popular saying","happiness"],
+ ["Be yourself; everyone else is already taken.","Oscar Wilde","identity"],
+ ["Whatever you are, be a good one.","Abraham Lincoln","ambitions"],
+ ["The only way to make sense out of change is to plunge into it.","Alan Watts","technology"],
+ ["Vaulting ambition, which o'erleaps itself, and falls on th'other.","William Shakespeare, Macbeth","macbeth"],
+ ["We do not inherit the earth from our ancestors; we borrow it from our children.","attributed to Antoine de Saint-Exupéry","environment"],
+ ["Travel is fatal to prejudice, bigotry, and narrow-mindedness.","Mark Twain","travel"],
+ ["If you are not paying for it, you're not the customer; you're the product being sold.","Andrew Lewis","media"],
+ ["Our diversity is our strength.","common slogan","diversity"],
+ ["Why fit in when you were born to stand out?","Dr. Seuss (attributed)","conformity"]
+];
+const PROFILE=`LEARNER: German student (Schleswig-Holstein), English oral Abitur 2027 at basic level (grundlegendes Niveau, target B2). Exam: partner exam, 20 min, no preparation time, no aids: warm-up (not graded), monologue 3–4 min on a quote/picture/chart/cartoon, then a dialogue with a partner on a different topic ending in an agreement. Marking holistic and tolerant at gN.
+The learner uses 6 sentence starters for the monologue: 1 "The quote/picture shows that…", 2 "In other words, …", 3 "I partly agree, because …" (argument FOR the statement), 4 "For example, …", 5 "On the other hand, …" (counter side), 6 "So, to sum up, …". Plus "Well, …" instead of fillers, short sentences.
+The learner gets overwhelmed by too much feedback: be SHORT, warm and focused.
+All learner text comes from automatic speech recognition: IGNORE punctuation, capitalisation, and obvious recognition errors (wrong homophones, garbled single words).`;
+
+/* ================= Gemini ================= */
+const API="https://generativelanguage.googleapis.com/v1beta";
+async function pickModel(key){
+  const r=await fetch(`${API}/models?pageSize=200`,{headers:{"x-goog-api-key":key}});
+  if(!r.ok){const t=await r.text();throw new Error(r.status===400||r.status===403?"Schlüssel ungültig ("+r.status+")":"Fehler "+r.status+": "+t.slice(0,120));}
+  const j=await r.json();
+  const ms=(j.models||[]).filter(m=>(m.supportedGenerationMethods||[]).includes("generateContent")).map(m=>m.name.replace(/^models\//,""));
+  const ok=ms.filter(n=>/^gemini-[\d.]+-flash(-latest)?$/.test(n));
+  const ver=n=>parseFloat((n.match(/gemini-([\d.]+)/)||[0,0])[1]);
+  ok.sort((a,b)=>ver(b)-ver(a));
+  if(ok.length) return ok[0];
+  const any=ms.filter(n=>/flash/.test(n)&&!/(image|tts|audio|live|embed|vision|thinking)/.test(n)).sort((a,b)=>ver(b)-ver(a)||(/preview|exp/.test(a)?1:-1));
+  if(any.length) return any[0];
+  if(ms.length) return ms[0];
+  throw new Error("Kein passendes Modell gefunden.");
+}
+async function gemini(prompt,o={}){ try{ return await gemini0(prompt,o); }catch(e){ if(e instanceof TypeError) throw new Error("Keine Verbindung zu Gemini – Internet prüfen und aufs Mikro tippen."); throw e; } }
+async function gemini0(prompt,{json=false,max=500,temp=0.9}={}){
+  if(!S.key) throw new Error("Kein Schlüssel");
+  if(!S.model){S.model=await pickModel(S.key);save();}
+  const body={contents:[{role:"user",parts:[{text:prompt}]}],generationConfig:{temperature:temp,maxOutputTokens:max}};
+  if(json) body.generationConfig.responseMimeType="application/json";
+  const think=S.noThink && /2\.5/.test(S.model);
+  if(think) body.generationConfig.thinkingConfig={thinkingBudget:0};
+  else if(S.noThink && /gemini-[3-9]/.test(S.model)) body.generationConfig.thinkingConfig={thinkingLevel:"low"};
+  let r=await fetch(`${API}/models/${S.model}:generateContent`,{method:"POST",headers:{"Content-Type":"application/json","x-goog-api-key":S.key},body:JSON.stringify(body)});
+  if(r.status===400 && body.generationConfig.thinkingConfig){ delete body.generationConfig.thinkingConfig; S.noThink=false; save();
+    r=await fetch(`${API}/models/${S.model}:generateContent`,{method:"POST",headers:{"Content-Type":"application/json","x-goog-api-key":S.key},body:JSON.stringify(body)}); }
+  if(r.status===404){ S.model=""; save(); throw new Error("Modell nicht mehr verfügbar – bitte nochmal versuchen."); }
+  if(r.status===429) throw new Error("Kurz zu viele Anfragen (Gratis-Limit). 30–60 Sekunden warten, dann weiter.");
+  if(!r.ok){const t=await r.text();throw new Error("Gemini-Fehler "+r.status+": "+t.slice(0,150));}
+  const j=await r.json();
+  const txt=((j.candidates||[])[0]?.content?.parts||[]).map(p=>p.text||"").join("").trim();
+  if(!txt) throw new Error("Leere Antwort – bitte nochmal.");
+  if(!json) return txt;
+  const m=txt.match(/[\[{][\s\S]*[\]}]/); return JSON.parse(m?m[0]:txt);
+}
+
+/* ================= Voice output ================= */
+const synth=window.speechSynthesis;
+let voices=[];
+function loadVoices(){ if(!synth) return; voices=synth.getVoices().filter(v=>/^en/i.test(v.lang)); fillVoiceSelects(); }
+if(synth){ loadVoices(); synth.onvoiceschanged=loadVoices; }
+function voiceFor(who){
+  const name= who==="sam"?S.voiceSam:S.voiceEx;
+  let v=voices.find(x=>x.name===name);
+  if(!v){ const gb=voices.filter(x=>/en-GB/i.test(x.lang)); const pool=gb.length?gb:voices; v= who==="sam" ? (pool[1]||voices.find(x=>/en-US/i.test(x.lang))||pool[0]) : pool[0]; }
+  return v||null;
+}
+let speakingCancel=null;
+function speak(text,who){
+  return new Promise(res=>{
+    if(!synth||!text){res();return;}
+    synth.cancel();
+    const parts=text.match(/[^.!?]+[.!?]*\s*/g)||[text];
+    let i=0, stopped=false;
+    speakingCancel=()=>{stopped=true;synth.cancel();res();};
+    const next=()=>{
+      if(stopped) return;
+      if(i>=parts.length){speakingCancel=null;res();return;}
+      const u=new SpeechSynthesisUtterance(parts[i++].trim());
+      const v=voiceFor(who); if(v){u.voice=v;u.lang=v.lang;} else u.lang="en-GB";
+      u.rate=S.rate; u.pitch= who==="sam"&&(!S.voiceSam)&&voices.length<2 ? 1.2 : 1;
+      u.onend=next; u.onerror=next; synth.speak(u);
+    };
+    next();
+  });
+}
+function stopSpeaking(){ if(speakingCancel) speakingCancel(); else if(synth) synth.cancel(); }
+
+/* ================= Voice input ================= */
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+let rec=null, listening=false, finals="", interim="", lastHeard=0, silTimer=null, listenResolve=null, autoSend=true;
+function startListening(auto){
+  return new Promise(resolve=>{
+    if(!SR){ showErr("Spracherkennung wird von diesem Browser nicht unterstützt. Nutze Chrome (Android) oder Safari (iPhone) – oder tippe mit ⌨️."); resolve(null); return; }
+    listenResolve=resolve; listening=true; autoSend=auto; finals=""; interim=""; lastHeard=Date.now();
+    setMic("listening", auto?"Ich höre zu …":"Ich höre zu – tippe „Fertig“, wenn du fertig bist");
+    liveBubble=addMsg("me","…",true);
+    const begin=()=>{
+      if(!listening) return;
+      try{
+        rec=new SR(); rec.lang="en-GB"; rec.continuous=false; rec.interimResults=true; rec.maxAlternatives=1;
+        rec.onresult=e=>{ let fin="",int=""; for(let i=e.resultIndex;i<e.results.length;i++){const r=e.results[i]; if(r.isFinal) fin+=r[0].transcript; else int+=r[0].transcript;}
+          if(fin){ finals=(finals+" "+fin).trim(); interim=""; } else interim=int;
+          lastHeard=Date.now(); updateLive(); };
+        rec.onerror=e=>{ if(e.error==="not-allowed"||e.error==="service-not-allowed"){ showErr("Mikrofon nicht erlaubt. Erlaube den Mikrofonzugriff für diese Seite in den Browser-Einstellungen – oder tippe mit ⌨️."); finishListening(true); }
+          else if(e.error==="network"){ showErr("Spracherkennung braucht Internet."); finishListening(true); } };
+        rec.onend=()=>{ rec=null; if(listening) setTimeout(begin,120); };
+        rec.start();
+      }catch(err){ setTimeout(begin,300); }
+    };
+    begin();
+    clearInterval(silTimer);
+    silTimer=setInterval(()=>{ if(!listening) return; const t=(finals+" "+interim).trim();
+      if(autoSend && t && Date.now()-lastHeard > S.silence*1000) finishListening(false); },300);
+  });
+}
+function finishListening(cancel){
+  if(!listening) return;
+  listening=false; clearInterval(silTimer);
+  try{ rec&&rec.stop(); }catch(e){}
+  const text=(finals+" "+interim).trim();
+  if(liveBubble){ if(!text||cancel) liveBubble.remove(); else { liveBubble.classList.remove("live"); liveBubble.lastChild.textContent=text; } liveBubble=null; }
+  const r=listenResolve; listenResolve=null; r&&r(cancel?null:(text||null));
+}
+let liveBubble=null;
+function updateLive(){ if(liveBubble){ liveBubble.lastChild.textContent=(finals+" "+interim).trim()||"…"; } }
+
+/* ================= UI helpers ================= */
+const views=["setup","home","session","me","settings"];
+function show(v){ views.forEach(x=>$("#v-"+x).classList.toggle("hidden",x!==v)); $("#dock").classList.toggle("hidden",v!=="session"); if(v==="me")renderMe(); if(v==="settings")renderSettings(); window.scrollTo(0,0); }
+document.querySelectorAll("[data-go]").forEach(b=>b.addEventListener("click",()=>show(b.dataset.go)));
+function addMsg(who,text,live){
+  const names={examiner:"Prüfer",sam:"Sam",me:"Du"};
+  const m=el("div",{class:"msg "+who+(live?" live":"")},el("span",{class:"who",text:names[who]}),document.createTextNode(text));
+  $("#s-chat").append(m); m.scrollIntoView({behavior:"smooth",block:"end"}); return m;
+}
+function setMic(state,label){
+  const m=$("#mic"); m.className="mic"+(state==="idle"?"":" "+state);
+  m.textContent= state==="listening"?"⏹":state==="busy"?"⋯":state==="speaking"?"🔊":"🎙️";
+  const titles={idle:"Du bist dran",listening:"Zuhören",busy:"Denkt nach",speaking:"Spricht"};
+  $("#state").innerHTML=""; $("#state").append(el("b",{text:titles[state]||""}),document.createTextNode(label||""));
+}
+function showErr(t){ $("#s-error").textContent=t||""; }
+
+/* ================= Session engine ================= */
+let SES=null, timerH=null;
+function startTimer(){ clearInterval(timerH); const st=Date.now(); const t=$("#s-timer"); const tick=()=>{const s=Math.floor((Date.now()-st)/1000);t.textContent=`${Math.floor(s/60)}:${String(s%60).padStart(2,"0")}`;}; tick(); timerH=setInterval(tick,1000); SES.tStart=st; }
+function stopTimer(){ clearInterval(timerH); return SES&&SES.tStart?Math.round((Date.now()-SES.tStart)/1000):0; }
+const transcript=()=>SES.log.map(l=>({examiner:"EXAMINER",sam:"PARTNER (Sam)",me:"LEARNER"}[l.who]+": "+l.text)).join("\n");
+
+async function say(who,text){ SES.log.push({who,text}); addMsg(who,text); setMic("speaking","tippe zum Überspringen"); await speak(text,who); }
+async function think(fn){ setMic("busy","einen Moment …"); showErr(""); try{ return await fn(); }catch(e){ showErr(e.message||String(e)); setMic("idle","Tippe aufs Mikro, um es nochmal zu versuchen"); throw e; } }
+
+/* waits for learner turn (voice or typed) */
+let turnResolve=null;
+function learnerTurn(mode){ // mode: "auto" | "manual"
+  SES.turnMode=mode;
+  return new Promise(res=>{
+    turnResolve=t=>{ turnResolve=null; res(t); };
+    $("#done-btn").textContent = mode==="manual" ? "Fertig" : "Senden";
+    if(mode==="auto" && S.autoListen) beginListen();
+    else setMic("idle", mode==="manual" ? "Tippe aufs Mikro und sprich – dann „Fertig“" : "Tippe aufs Mikro und antworte");
+  });
+}
+async function beginListen(){
+  const t=await startListening(SES.turnMode==="auto");
+  if(t){ SES.log.push({who:"me",text:t}); turnResolve&&turnResolve(t); }
+  else if(turnResolve && SES && SES.endRequested) turnResolve("");
+  else if(turnResolve) setMic("idle","Tippe aufs Mikro und sprich");
+}
+$("#mic").addEventListener("click",()=>{
+  unlockAudio();
+  if(speakingCancel||(synth&&synth.speaking)){ stopSpeaking(); return; }
+  if(listening){ finishListening(false); return; }
+  if(turnResolve) beginListen();
+  else if(SES&&SES.retry){ const r=SES.retry; SES.retry=null; r(); }
+});
+$("#done-btn").addEventListener("click",()=>{ if(listening) finishListening(false); else if(SES&&SES.onDone) SES.onDone(); });
+$("#type-btn").addEventListener("click",()=>{ $("#typebox").classList.toggle("hidden"); $("#type-in").focus(); });
+const sendTyped=()=>{ const t=$("#type-in").value.trim(); if(!t||!turnResolve) return; if(listening) finishListening(true); $("#type-in").value=""; addMsg("me",t); SES.log.push({who:"me",text:t}); turnResolve(t); };
+$("#type-send").addEventListener("click",sendTyped);
+$("#type-in").addEventListener("keydown",e=>{ if(e.key==="Enter") sendTyped(); });
+$("#s-back").addEventListener("click",()=>{ endSession(); show("home"); });
+function endSession(){ if(SES) SES.dead=true; if(listening) finishListening(true); stopSpeaking(); stopTimer(); turnResolve=null; SES=null; }
+let unlocked=false;
+function unlockAudio(){ if(unlocked||!synth) return; unlocked=true; try{ const u=new SpeechSynthesisUtterance(" "); u.volume=0; synth.speak(u);}catch(e){} }
+
+async function retryable(fn){ // run fn; on error let user tap mic to retry
+  for(;;){ try{ return await think(fn); }catch(e){ if(!SES||SES.dead) throw e; await new Promise(r=>{SES.retry=r;}); } }
+}
+function alive(){ if(!SES||SES.dead) throw new Error("__ended"); }
+
+/* ---- AI roles ---- */
+function examinerPrompt(task){
+  return `You are a friendly, calm examiner in a German Abitur English oral exam (basic level). Speak natural, clear British English, short (1–3 sentences). Never correct mistakes, never give feedback during the exam, never use lists or emojis.
+${task}
+
+Conversation so far:
+${transcript()}
+
+Reply with ONLY the examiner's next words.`;
+}
+function samPrompt(sit,n){
+  return `You are "Sam", a German classmate (17) taking the English oral Abitur exam together with the learner – the partner dialogue part. Situation: ${sit}
+Speak like a real student at good B2 level: natural, spoken English, 2–4 short sentences, no lists, no emojis. Have your OWN clear opinion (different from the learner's at first), react DIRECTLY to what the learner just said (pick up their argument, agree or disagree with it, give a reason or example from teenage life), and often end with a question. Never correct the learner, never act as a teacher.
+${n>=5?"You have talked for a while now: start moving towards a compromise and suggest an agreement (e.g. 'So, shall we agree on …?'). If you already agreed, close the conversation in one friendly sentence.":""}
+
+Conversation so far:
+${transcript()}
+
+Reply with ONLY what Sam says next.`;
+}
+const KIND={quote:"Zitat",picture:"Foto",chart:"Diagramm",cartoon:"Cartoon"};
+async function makeImpulse(topicKey){
+  const tname=(TOPICS.find(t=>t[0]===topicKey)||TOPICS[0])[1];
+  const kind=["quote","quote","picture","chart","cartoon"][Math.floor(Math.random()*5)];
+  try{
+    const r=await gemini(`${PROFILE}
+
+Create ONE fresh monologue prompt for this oral exam. Topic: "${tname}". Type: ${kind}.
+- quote: real, correctly attributed, discussable (vary – not always the most famous).
+- picture: no image can be shown, so describe a realistic photo vividly in 3–4 sentences.
+- chart: realistic statistics, 4–6 bars with unit and a plausible source/year; desc = one sentence context.
+- cartoon: describe it in 3–4 sentences including the caption.
+Seed: ${Math.random().toString(36).slice(2,7)}
+JSON only: {"kind":"${kind}","quote":"","author":"","desc":"","caption":"","title":"","unit":"","data":[{"label":"","value":0}],"task":"one-sentence exam task"}`,{json:true,max:700,temp:1});
+    if(!r||!r.task) throw 0; r.kind=KIND[r.kind]?r.kind:kind; if(r.kind==="quote"&&!r.quote) throw 0; r.topic=tname; return r;
+  }catch(e){
+    if(e instanceof Error && /Schlüssel|429|Limit/.test(e.message)) throw e;
+    const pool=FALLBACK_QUOTES.filter(q=>q[2]===topicKey); const q=(pool.length?pool:FALLBACK_QUOTES)[Math.floor(Math.random()*(pool.length||FALLBACK_QUOTES.length))];
+    return {kind:"quote",quote:q[0],author:q[1],task:"Explain the quote and comment on it.",topic:tname};
+  }
+}
+function impulseText(i){ let s=`${i.kind}: `; if(i.kind==="quote") s+=`"${i.quote}" – ${i.author}. `; if(i.desc) s+=i.desc+" "; if(i.caption) s+=`Caption: "${i.caption}". `; if(i.kind==="chart"&&Array.isArray(i.data)) s+=`Chart "${i.title}" (${i.unit}): `+i.data.map(d=>d.label+": "+d.value).join("; ")+". "; return s+"Task: "+i.task; }
+function impulseSpoken(i){ if(i.kind==="quote") return `Here is your quote. ${i.quote} — ${i.author}. ${i.task} You can start whenever you're ready.`; if(i.kind==="chart") return `Please look at the chart on your screen. ${i.task} You can start whenever you're ready.`; return `${i.desc} ${i.caption?("The caption says: "+i.caption+"."):""} ${i.task} You can start whenever you're ready.`; }
+function renderImpulse(i){
+  const c=$("#s-impulse"); c.innerHTML=""; c.classList.remove("hidden");
+  const b=el("div",{class:"impulse"},el("div",{class:"kind",text:KIND[i.kind]+" · "+i.topic}));
+  if(i.kind==="quote") b.append(el("div",{class:"quote",text:"“"+i.quote+"”"}),el("div",{class:"author",text:"— "+i.author}));
+  else if(i.kind==="chart"){ b.append(chartSVG(i)); if(i.desc) b.append(el("div",{class:"cap",text:i.desc})); }
+  else { b.append(el("div",{text:i.desc||""})); if(i.caption) b.append(el("div",{class:"cap",text:"Caption: „"+i.caption+"“"})); }
+  c.append(b,el("div",{class:"task",text:i.task}));
+  $("#s-starters").classList.remove("hidden");
+}
+function chartSVG(i){
+  const ns="http://www.w3.org/2000/svg", data=(i.data||[]).filter(d=>isFinite(+d.value)).slice(0,7);
+  const W=600,rh=34,lw=190,H=data.length*rh+34,max=Math.max(1,...data.map(d=>+d.value));
+  const svg=document.createElementNS(ns,"svg"); svg.setAttribute("viewBox",`0 0 ${W} ${H}`); svg.setAttribute("width","100%");
+  const fill=getComputedStyle(document.documentElement).getPropertyValue("--accent").trim(), ink=getComputedStyle(document.documentElement).getPropertyValue("--ink").trim();
+  const T=(x,y,t,o={})=>{const e=document.createElementNS(ns,"text");e.setAttribute("x",x);e.setAttribute("y",y);e.setAttribute("fill",ink);e.setAttribute("font-size",o.s||13);if(o.a)e.setAttribute("text-anchor",o.a);if(o.w)e.setAttribute("font-weight",o.w);e.textContent=t;svg.append(e);};
+  T(0,16,(i.title||"")+(i.unit?` (${i.unit})`:""),{s:15,w:700});
+  data.forEach((d,k)=>{const y=32+k*rh,w=(W-lw-70)*(+d.value)/max; T(lw-8,y+18,String(d.label).slice(0,28),{a:"end"});
+    const r=document.createElementNS(ns,"rect"); r.setAttribute("x",lw);r.setAttribute("y",y+4);r.setAttribute("width",Math.max(2,w));r.setAttribute("height",20);r.setAttribute("rx",4);r.setAttribute("fill",fill);svg.append(r);
+    T(lw+w+6,y+18,String(d.value),{w:600});});
+  return svg;
+}
+
+/* ---- Modes ---- */
+async function runWarmup(rounds){
+  SES.phase="warm";
+  await say("examiner", await retryable(()=>gemini(examinerPrompt("This is the WARM-UP (not graded). Greet the learner briefly and ask one easy personal question (school, hobbies, plans, weekend)."),{max:200})));
+  for(let k=0;k<rounds;k++){
+    alive(); await learnerTurn("auto"); alive();
+    if(SES.endRequested) break;
+    const last=k===rounds-1 && SES.mode==="exam";
+    const txt=await retryable(()=>gemini(examinerPrompt(last?"WARM-UP is over: react to the learner's answer in one short sentence, then say you will now move on to the monologue.":"WARM-UP: react briefly and naturally to what the learner just said (show interest, refer to a detail), then ask ONE new easy follow-up question."),{max:200}));
+    alive(); await say("examiner",txt);
+  }
+}
+async function runMonologue(topicKey){
+  SES.phase="mono";
+  const imp=await retryable(()=>makeImpulse(topicKey)); alive(); SES.impulse=imp;
+  renderImpulse(imp);
+  SES.log.push({who:"examiner",text:"[Monologue task] "+impulseText(imp)});
+  addMsg("examiner",impulseSpoken(imp)); setMic("speaking","tippe zum Überspringen"); await speak(impulseSpoken(imp),"examiner");
+  alive(); startTimer();
+  const mono=await learnerTurn("manual"); alive(); SES.monoSecs=stopTimer(); SES.mono=mono;
+  const q=await retryable(()=>gemini(examinerPrompt("The learner has just finished the MONOLOGUE on the task above. Thank them in a few words and ask ONE short follow-up question that refers to something specific they said (or ask them to explain one point further)."),{max:200}));
+  alive(); await say("examiner",q);
+  await learnerTurn("auto"); alive();
+}
+async function runDialog(topicKey,maxTurns){
+  SES.phase="dialog"; const sit=DIALOGS[topicKey]||DIALOGS.media; SES.sit=sit;
+  const c=$("#s-impulse"); c.innerHTML=""; c.classList.remove("hidden"); $("#s-starters").classList.add("hidden");
+  c.append(el("div",{class:"impulse"},el("div",{class:"kind",text:"Dialog · "+(TOPICS.find(t=>t[0]===topicKey)||["",""])[1]}),el("div",{text:sit})),el("div",{class:"note",style:"margin-top:8px",text:"Reagiere auf Sam, frag nach, begründe – und einigt euch am Ende („So, shall we agree on …?“). Tippe „Beenden“, wenn ihr euch geeinigt habt."}));
+  if(SES.mode==="exam") await say("examiner","Thank you. Now let's move on to the dialogue with your partner. Here is your situation: "+sit);
+  alive(); startTimer();
+  let n=0;
+  await say("sam", await retryable(()=>gemini(samPrompt(sit,0)+"\n(Start the conversation: greet briefly, state your opinion with one reason and ask the learner.)",{max:220})));
+  $("#done-btn").textContent="Senden";
+  for(;;){
+    alive(); SES.onDone=null;
+    const t=await learnerTurn("auto"); alive(); n++;
+    if(SES.endRequested) break;
+    if(n>=maxTurns) break;
+    const r=await retryable(()=>gemini(samPrompt(sit,n),{max:220})); alive(); await say("sam",r);
+    if(SES.endRequested) break;
+  }
+  stopTimer();
+}
+
+async function startMode(mode){
+  unlockAudio();
+  const sel=$("#topic").value; const topic= sel==="random"?TOPICS[Math.floor(Math.random()*TOPICS.length)][0]:sel;
+  SES={mode,topic,log:[],dead:false}; $("#s-chat").innerHTML=""; $("#s-feedback").innerHTML=""; $("#s-impulse").classList.add("hidden"); $("#s-starters").classList.add("hidden"); $("#s-timer").textContent=""; showErr("");
+  $("#s-title").textContent={mono:"Monolog",dialog:"Dialog mit Sam",exam:"Prüfungssimulation",warm:"Locker plaudern"}[mode];
+  show("session"); setMic("busy","wird vorbereitet …");
+  const endBtn=$("#done-btn");
+  try{
+    if(mode==="warm"){ addEndButton(); await runWarmup(8); }
+    if(mode==="mono"){ await runMonologue(topic); }
+    if(mode==="dialog"){ addEndButton(); await runDialog(topic,12); }
+    if(mode==="exam"){ await runWarmup(2); await runMonologue(topic); let dt; do{dt=TOPICS[Math.floor(Math.random()*TOPICS.length)][0];}while(dt===topic); addEndButton(); await runDialog(dt,8);
+      await say("examiner","Thank you both, that's the end of the exam."); }
+    alive(); removeEndButton();
+    await giveFeedback();
+  }catch(e){ if(e.message!=="__ended"&&SES){ showErr(e.message); setMic("idle",""); } }
+}
+function addEndButton(){ removeEndButton(); const b=el("button",{class:"btn ghost small",id:"end-btn",text:"Beenden"}); b.onclick=()=>{ if(!SES) return; SES.endRequested=true; if(listening) finishListening(false); else if(turnResolve){ turnResolve(""); } else stopSpeaking(); }; $(".dock .side").append(b); }
+function removeEndButton(){ const b=$("#end-btn"); if(b) b.remove(); }
+document.querySelectorAll("[data-mode]").forEach(b=>b.addEventListener("click",()=>startMode(b.dataset.mode)));
+
+/* ================= Feedback ================= */
+const FB_FORMAT=`Reply with ONLY one JSON object:
+{"gut":[1-2 short German sentences: what was genuinely good],
+ "korrekturen":[up to 3 MOST important errors: {"gesagt":"exact phrase the learner said","besser":"corrected English","warum":"very short German explanation (max 12 words)"}],
+ "upgrades":[up to 2: {"statt":"simple phrase used","besser":"more natural B2 phrase"}],
+ "flow_tipp":"ONE concrete German tip on fluency/structure/interaction",
+ "wiederholen":[2 short correct English model sentences built from the learner's own ideas, to repeat aloud 3 times],
+ "punkte":{"sprache":0-15,"fluss":0-15,"inhalt":0-15},
+ "gesamt": overall 0-15 (only for a full exam, else null),
+ "baustellen_neu":[0-2 recurring-type weaknesses seen now: {"text":"short label","hinweis":"short German rule"} – if it matches an existing Baustelle copy its text EXACTLY],
+ "baustellen_richtig":[exact texts of existing Baustellen handled CORRECTLY this time]}
+Points: German 0-15 scale for basic level (13-15 very good, 10-12 good, 7-9 satisfactory, 4-6 weak). Fair and realistic.`;
+async function giveFeedback(){
+  const mine=SES.log.filter(l=>l.who==="me"&&l.text);
+  if(!mine.length){ setMic("idle",""); return; }
+  if(listening) finishListening(true);
+  setMic("busy","Feedback wird erstellt …");
+  const open=S.baustellen.filter(b=>!b.fixed).map(b=>"- "+b.text).join("\n")||"(none)";
+  const what={mono:"a MONOLOGUE (plus one follow-up answer)",dialog:"a partner DIALOGUE (rate only the learner; focus also on reacting, asking, giving reasons, polite disagreement, reaching an agreement)",exam:"a FULL MOCK EXAM (warm-up not graded; rate monologue and dialogue holistically)",warm:"casual SMALL TALK"}[SES.mode];
+  const prompt=`${PROFILE}
+
+The learner's open Baustellen – check especially for these:
+${open}
+
+This was ${what}.
+${SES.impulse?"Monologue task: "+impulseText(SES.impulse):""}
+${SES.monoSecs?`Monologue length: about ${(SES.monoSecs/60).toFixed(1)} min (target 3–4).`:""}
+
+TRANSCRIPT:
+${transcript().slice(0,14000)}
+
+Give feedback as their personal speaking coach.
+${FB_FORMAT}`;
+  let fb;
+  for(;;){ try{ fb=await gemini(prompt,{json:true,max:1600,temp:0.4}); break; }catch(e){ if(!SES||SES.dead) return; showErr(e.message+" – tippe aufs Mikro für einen neuen Versuch."); setMic("idle","Feedback nochmal versuchen"); await new Promise(r=>{SES.retry=r;}); showErr(""); setMic("busy","Feedback wird erstellt …"); } }
+  applyBaustellen(fb);
+  const p=fb.punkte||{};
+  S.history.push({d:new Date().toISOString().slice(0,10),mode:{mono:"Monolog",dialog:"Dialog",exam:"Prüfung",warm:"Small Talk"}[SES.mode],s:+p.sprache||0,f:+p.fluss||0,i:+p.inhalt||0,g:fb.gesamt??null});
+  S.history=S.history.slice(-100); save();
+  renderFeedback(fb);
+  setMic("idle","Fertig – oben ✕ für neues Training");
+  speak(SES.mode==="exam"&&fb.gesamt!=null?`Well done. Your estimated result is ${fb.gesamt} points. Have a look at your feedback.`:"Well done! Have a look at your feedback.","examiner");
+}
+function applyBaustellen(fb){
+  const n=s=>String(s||"").trim().toLowerCase(); let add=0,ok=0;
+  (fb.baustellen_neu||[]).slice(0,2).forEach(x=>{const t=String(x.text||"").trim(); if(!t)return; const e=S.baustellen.find(b=>n(b.text)===n(t)); if(e){e.count=(e.count||1)+1;e.fixed=false;} else {S.baustellen.unshift({text:t,hint:String(x.hinweis||""),count:1,fixed:false});add++;}});
+  (fb.baustellen_richtig||[]).forEach(r=>{const e=S.baustellen.find(b=>n(b.text)===n(r)); if(e){e.fixed=true;ok++;}});
+  fb._msg=[add?add+" neue Baustelle(n) gespeichert":"",ok?ok+" Baustelle(n) diesmal richtig 💪":""].filter(Boolean).join(" · ");
+}
+function renderFeedback(fb){
+  const out=$("#s-feedback"); out.innerHTML=""; const c=el("div",{class:"card"}); c.append(el("h2",{text:SES.mode==="exam"?"Prüfungsergebnis":"Feedback"}));
+  const A=v=>Array.isArray(v)?v:[];
+  if(A(fb.gut).length){const s=el("div",{class:"fb-sec fb-good"},el("h4",{text:"✅ Gut gemacht"}));const u=el("ul",{class:"plain"});A(fb.gut).forEach(g=>u.append(el("li",{text:String(g)})));s.append(u);c.append(s);}
+  if(A(fb.korrekturen).length){const s=el("div",{class:"fb-sec fb-fix"},el("h4",{text:"✏️ Korrigieren"}));A(fb.korrekturen).slice(0,3).forEach(k=>s.append(el("div",{class:"fix"},el("span",{class:"said",text:String(k.gesagt||"")}),document.createTextNode(" → "),el("span",{class:"better",text:String(k.besser||"")}),el("div",{class:"why",text:String(k.warum||"")}))));c.append(s);}
+  if(A(fb.upgrades).length){const s=el("div",{class:"fb-sec fb-up"},el("h4",{text:"⬆️ Klingt besser"}));A(fb.upgrades).slice(0,2).forEach(u=>s.append(el("div",{class:"fix"},el("span",{text:String(u.statt||"")+" → "}),el("span",{class:"better",text:String(u.besser||"")}))));c.append(s);}
+  if(fb.flow_tipp) c.append(el("div",{class:"fb-sec fb-flow"},el("h4",{text:"🗣️ Flow-Tipp"}),el("div",{text:String(fb.flow_tipp)})));
+  if(A(fb.wiederholen).length){const s=el("div",{class:"fb-sec fb-rep"},el("h4",{text:"🔁 3× laut nachsprechen"}));const u=el("ul",{class:"plain"});A(fb.wiederholen).slice(0,2).forEach(w=>{const li=el("li",{text:String(w)+" "});const b=el("button",{class:"x","aria-label":"Vorlesen"});b.textContent="🔊";b.onclick=()=>speak(String(w),"examiner");li.append(b);u.append(li);});s.append(u);c.append(s);}
+  if(fb.punkte){const sc=el("div",{class:"scores"});[["sprache","Sprache"],["fluss","Flüssigkeit"],["inhalt","Inhalt"]].forEach(([k,l])=>sc.append(el("div",{class:"score"},el("b",{text:String(fb.punkte[k]??"–")}),el("span",{text:l}))));c.append(el("h3",{text:"📊 Punkte (0–15)"}),sc);
+    if(fb.gesamt!=null) c.append(el("p",{class:"note",text:"Geschätzte Gesamtnote: "+fb.gesamt+" Punkte"}));}
+  if(fb._msg) c.append(el("p",{class:"note",text:fb._msg}));
+  out.append(c); out.scrollIntoView({behavior:"smooth",block:"start"});
+}
+
+/* ================= Me / Settings ================= */
+function renderMe(){
+  const L=$("#bs-list"); L.innerHTML="";
+  [...S.baustellen].sort((a,b)=>(a.fixed-b.fixed)||((b.count||0)-(a.count||0))).forEach(b=>{
+    const d=el("button",{class:"x","aria-label":"Entfernen"}); d.textContent="×"; d.onclick=()=>{S.baustellen=S.baustellen.filter(x=>x!==b);save();renderMe();};
+    L.append(el("div",{class:"bs"+(b.fixed?" fixed":"")},el("div",{},el("div",{class:"t",text:b.text}),b.hint?el("div",{class:"h",text:b.hint}):null),el("span",{class:"cnt",text:b.fixed?"✓":"×"+(b.count||1)}),d));
+  });
+  const H=$("#hist"); H.innerHTML=""; const hs=S.history.slice(-15).reverse();
+  if(!hs.length){H.append(el("p",{class:"note",text:"Nach deinem ersten Feedback erscheinen hier deine Punkte."}));return;}
+  const g=el("div",{class:"hist"});
+  hs.forEach(h=>{const avg=h.g!=null?h.g:Math.round((h.s+h.f+h.i)/3*10)/10; g.append(el("span",{class:"note",text:h.d.slice(5).split("-").reverse().join(".")+" · "+h.mode}),el("div",{class:"bar"},el("i",{style:`width:${Math.min(100,avg/15*100)}%`})),el("b",{text:String(avg)}));});
+  H.append(g);
+}
+$("#bs-add-btn").addEventListener("click",()=>{const v=$("#bs-add").value.trim();if(!v)return;S.baustellen.unshift({text:v,hint:"",count:1,fixed:false});$("#bs-add").value="";save();renderMe();});
+function fillVoiceSelects(){
+  for(const [id,key] of [["#voice-ex","voiceEx"],["#voice-sam","voiceSam"]]){
+    const s=$(id); if(!s) continue; s.innerHTML=""; s.append(el("option",{value:"",text:"Automatisch"}));
+    voices.forEach(v=>s.append(el("option",{value:v.name,text:v.name+" ("+v.lang+")"}))); s.value=S[key]||"";
+  }
+}
+function renderSettings(){
+  fillVoiceSelects(); $("#rate").value=S.rate; $("#rate-v").textContent=S.rate; $("#auto-listen").checked=S.autoListen; $("#silence").value=S.silence; $("#sil-v").textContent=S.silence; $("#model-name").textContent=S.model||"(wird automatisch gewählt)";
+}
+$("#voice-ex").addEventListener("change",e=>{S.voiceEx=e.target.value;save();});
+$("#voice-sam").addEventListener("change",e=>{S.voiceSam=e.target.value;save();});
+$("#rate").addEventListener("input",e=>{S.rate=+e.target.value;$("#rate-v").textContent=S.rate;save();});
+$("#silence").addEventListener("input",e=>{S.silence=+e.target.value;$("#sil-v").textContent=S.silence;save();});
+$("#auto-listen").addEventListener("change",e=>{S.autoListen=e.target.checked;save();});
+$("#voice-test").addEventListener("click",async()=>{unlockAudio(); await speak("Hello, I'm your examiner. Let's start with the monologue.","examiner"); await speak("Hi, I'm Sam. I think we should agree on something.","sam");});
+$("#key-change").addEventListener("click",()=>{$("#key-in").value=S.key;show("setup");});
+$("#backup-copy").addEventListener("click",async()=>{const t=JSON.stringify({baustellen:S.baustellen,history:S.history});const b=$("#backup-box");b.classList.remove("hidden");b.value=t;b.select();try{await navigator.clipboard.writeText(t);$("#backup-msg").textContent="Kopiert ✓";}catch(e){$("#backup-msg").textContent="Text oben markiert – kopieren und z. B. in Notizen speichern.";}});
+$("#backup-load").addEventListener("click",()=>{const b=$("#backup-box");if(b.classList.contains("hidden")||!b.value.trim()){b.classList.remove("hidden");b.value="";b.placeholder="Backup hier einfügen und nochmal tippen";return;}
+  try{const v=JSON.parse(b.value);if(!Array.isArray(v.baustellen))throw 0;S.baustellen=v.baustellen;S.history=Array.isArray(v.history)?v.history:[];save();$("#backup-msg").textContent="Wiederhergestellt ✓";}catch(e){$("#backup-msg").textContent="Das ist kein gültiges Backup.";}});
+
+/* ================= Setup ================= */
+$("#key-save").addEventListener("click",async()=>{
+  const k=$("#key-in").value.trim(); const m=$("#key-msg"); if(!k){m.textContent="Bitte Schlüssel einfügen.";return;}
+  m.textContent="Teste …"; $("#key-save").disabled=true;
+  try{ const model=await pickModel(k); S.key=k; S.model=model; S.noThink=true; save();
+    await gemini("Say only: OK",{max:20}); m.textContent="✓ Funktioniert ("+model+")"; setTimeout(()=>show("home"),600);
+  }catch(e){ m.textContent="✗ "+(e.message||e); }
+  finally{ $("#key-save").disabled=false; }
+});
+
+/* ================= Boot ================= */
+const ts=$("#topic"); ts.append(el("option",{value:"random",text:"Zufällig"})); TOPICS.forEach(([k,v])=>ts.append(el("option",{value:k,text:v})));
+try{const t=localStorage.getItem(LS+".topic"); if(t) ts.value=t;}catch(e){}
+ts.addEventListener("change",()=>{try{localStorage.setItem(LS+".topic",ts.value);}catch(e){}});
+show(S.key?"home":"setup");
+})();
+</script>
+</body>
+</html>
